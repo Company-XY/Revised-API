@@ -20,7 +20,7 @@ import {
   updateJob,
   deleteJob,
   downloadJobFile,
-} from "../controllers/jobsCrud.js";
+} from "../controllers/Jobs.js";
 
 const router = express.Router();
 
