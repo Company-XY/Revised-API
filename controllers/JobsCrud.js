@@ -76,65 +76,6 @@ export const createJob = asyncHandler(async (req, res) => {
   }
 });
 
-export const createJob2 = asyncHandler(async (req, res) => {
-  try {
-    const {
-      title,
-      services,
-      description,
-      user_email,
-      name,
-      skills,
-      budget,
-      duration,
-    } = req.body;
-
-    const user = await User.findOne({ email: user_email });
-
-    if (!user) {
-      return res.status(400).json({
-        message: "User not found..",
-      });
-    }
-
-    if (user.role !== "Client") {
-      return res.status(400).json({
-        message: "Only users with the role 'Client' can create a job.",
-      });
-    }
-
-    const multerUpload = upload.array("files", 10);
-
-    multerUpload(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({ message: "File upload failed" });
-      }
-
-      const files = req.files.map((file) => ({
-        title: file.originalname,
-        fileUrl: file.path,
-      }));
-
-      const newJob = await Job.create({
-        user: user._id,
-        name,
-        user_email,
-        title,
-        services,
-        description,
-        skills,
-        budget,
-        duration,
-        files,
-      });
-
-      res.status(201).json(newJob);
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 //----------------------------------------------------------------------------
 export const getSingleJob = asyncHandler(async (req, res) => {
   try {
@@ -246,5 +187,3 @@ export const downloadJobFile = asyncHandler(async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-
