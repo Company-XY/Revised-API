@@ -1,12 +1,4 @@
 import express from "express";
-import {
-  getAllJobs,
-  createJob,
-  getSingleJob,
-  updateJob,
-  deleteJob,
-  downloadJobFile,
-} from "../controllers/jobsCrud.js";
 
 import {
   createProduct,
@@ -20,6 +12,15 @@ import { approveJob, disputeJob } from "../controllers/productFunctions.js";
 
 import { updateJobFiles } from "../controllers/jobFiles.js";
 import { updateBidFiles } from "../controllers/bidFiles.js";
+
+import {
+  getAllJobs,
+  createJob,
+  getSingleJob,
+  updateJob,
+  deleteJob,
+  downloadJobFile,
+} from "../controllers/jobsCrud.js";
 
 const router = express.Router();
 
