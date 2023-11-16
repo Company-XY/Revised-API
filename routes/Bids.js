@@ -7,12 +7,16 @@ import {
   deleteBid,
 } from "../controllers/bidsCrud.js";
 
+import { downloadBidFile } from "../controllers/bidFiles.js";
+
 import { awardBid, cancelBid } from "../controllers/bidFunctions.js";
 
 const router = express.Router();
 
 router.get("/jobs/:jobId", getAllBids);
 router.get("/jobs/bids/:jobId/:bidId", getSingleBid);
+
+router.get("/jobs/bids/:jobId/:bidId/:fileId", downloadBidFile);
 
 router.post("/jobs/:jobId/create", createBid);
 
@@ -24,6 +28,5 @@ router.delete("/jobs/bids/delete/:jobId/:bidId", deleteBid);
 router.patch("/jobs/:jobId/bids/:bidId/award", awardBid);
 
 router.patch("/jobs/:jobId/bids/:bidId/cancel", cancelBid);
-
 
 export default router;
