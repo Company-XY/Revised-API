@@ -13,6 +13,8 @@ import { approveJob, disputeJob } from "../controllers/productFunctions.js";
 import { updateJobFiles } from "../controllers/jobFiles.js";
 import { updateBidFiles } from "../controllers/bidFiles.js";
 
+//import { downloadJobFile } from "../controllers/jobFiles.js";
+
 import {
   getAllJobs,
   createJob,

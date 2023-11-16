@@ -20,6 +20,7 @@ import {
   updateProfile,
   viewUserProfile,
   uploadSamples,
+  downloadSampleWorkFile,
 } from "../controllers/Profile.js";
 import {
   createToken,
@@ -75,5 +76,8 @@ router.patch("/certifications/:id/:certId", updateCertification);
 
 //TO BE DELETED
 router.patch("/money/:id", updateBalance);
+
+//SAMPLE FILES GET
+router.get("/user/:id/samples/:fileId", downloadSampleWorkFile);
 
 export default router;

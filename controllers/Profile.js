@@ -3,10 +3,10 @@ import asyncHandler from "express-async-handler";
 import upload from "../middlewares/multer.js";
 import cloudinary from "../config/cloudinary.js";
 import multer from "multer";
-import AWS from "aws-sdk";
 import fs from "fs";
 import dotenv from "dotenv";
 import util from "util";
+import path from "path";
 
 dotenv.config();
 
@@ -165,23 +165,18 @@ export const updateProfile = asyncHandler(async (req, res) => {
   }
 });
 
-//======SAMPLE WORKS=====================
+//SAMPLE WORKS==========================
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "temp");
+    cb(null, "public/samples");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
   },
 });
 
-const upload2 = multer({ storage: storage });
-
-const s3 = new AWS.S3({
-  accessKeyId: process.env.ACCESS_KEY_ID,
-  secretAccessKey: process.env.SECRET_ACCESS_KEY,
-});
+const upload2 = multer({ storage });
 
 export const uploadSamples = async (req, res) => {
   try {
@@ -200,19 +195,14 @@ export const uploadSamples = async (req, res) => {
       const sampleWork = [];
 
       for (const file of req.files) {
+        const filePath = path.join("public/samples", file.originalname);
+
         const fileContent = fs.readFileSync(file.path);
-
-        const params = {
-          Bucket: "trialassist",
-          Key: file.originalname,
-          Body: fileContent,
-        };
-
-        const data = await s3.upload(params).promise();
+        fs.writeFileSync(filePath, fileContent);
 
         sampleWork.push({
           title: file.originalname,
-          fileUrl: data.Location,
+          fileUrl: filePath,
         });
 
         fs.unlinkSync(file.path);
@@ -228,6 +218,31 @@ export const uploadSamples = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
+    console.error(error);
+  }
+};
+
+export const downloadSampleWorkFile = async (req, res) => {
+  try {
+    const { id, fileId } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const file = user.sampleWork.find((f) => f._id.toString() === fileId);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const filePath = file.fileUrl; 
+
+    res.download(filePath, file.title);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
     console.error(error);
   }
 };
