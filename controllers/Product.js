@@ -24,7 +24,12 @@ const upload = multer({ storage: storage });
 
 export const createProduct = asyncHandler(async (req, res) => {
   try {
-    const jobId = req.params.jobId;
+    const { jobId } = req.params;
+
+    if (!jobId) {
+      return res.status(404).json({ message: "JOB ID not provided" });
+    }
+
     const job = await Job.findById(jobId);
 
     if (!job) {
@@ -79,14 +84,9 @@ export const downloadProductFile = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const timestamp = new Date().getTime();
-    const fileExtension = file.title.split(".").pop();
-    const newFileName = `file_${timestamp}.${fileExtension}`;
-    const newFilePath = path.join("public/productFiles", newFileName);
+    const filePath = file.fileUrl;
 
-    fs.renameSync(file.fileUrl, newFilePath);
-
-    res.download(newFilePath, file.title);
+    res.download(filePath, file.title);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
