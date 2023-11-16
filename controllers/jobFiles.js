@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import util from "util";
 import Job from "../models/Job.js";
+import asyncHandler from "express-async-handler";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,8 +18,8 @@ const upload = multer({ storage });
 
 export const updateJobFiles = async (req, res) => {
   try {
-    const { id } = req.params;
-    const job = await Job.findById(id);
+    const { jobId } = req.params;
+    const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -32,7 +33,10 @@ export const updateJobFiles = async (req, res) => {
       const newFiles = [];
 
       for (const file of req.files) {
-        const filePath = path.join("public/files", file.originalname);
+        const timestamp = new Date().getTime();
+        const fileExtension = file.originalname.split(".").pop();
+        const newFileName = `file_${timestamp}.${fileExtension}`;
+        const filePath = path.join("public/files", newFileName);
 
         fs.renameSync(file.path, filePath);
 
@@ -56,27 +60,32 @@ export const updateJobFiles = async (req, res) => {
   }
 };
 
-export const downloadJobFile = async (req, res) => {
+export const downloadJobFile = asyncHandler(async (req, res) => {
   try {
-    const { id, fileId } = req.params;
+    const { jobId, fileId } = req.params;
 
-    const job = await Job.findById(id);
+    const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    const file = job.files.id(fileId);
+    const file = job.files.find((f) => f._id.toString() === fileId);
 
     if (!file) {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const filePath = file.fileUrl;
+    const timestamp = new Date().getTime();
+    const fileExtension = file.title.split(".").pop();
+    const newFileName = `file_${timestamp}.${fileExtension}`;
+    const newFilePath = path.join("public/files", newFileName);
 
-    res.download(filePath, file.title);
+    fs.renameSync(file.fileUrl, newFilePath);
+
+    res.download(newFilePath, file.title);
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.error(error);
   }
-};
+});

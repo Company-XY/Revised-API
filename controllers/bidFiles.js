@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import util from "util";
 import Job from "../models/Job.js";
+import asyncHandler from "express-async-handler";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -37,7 +38,10 @@ export const updateBidFiles = async (req, res) => {
       const newFiles = [];
 
       for (const file of req.files) {
-        const filePath = path.join("public/bids", file.originalname);
+        const timestamp = new Date().getTime();
+        const fileExtension = file.originalname.split(".").pop();
+        const newFileName = `file_${timestamp}.${fileExtension}`;
+        const filePath = path.join("public/bidFiles", newFileName);
 
         fs.renameSync(file.path, filePath);
 
@@ -61,7 +65,7 @@ export const updateBidFiles = async (req, res) => {
   }
 };
 
-export const downloadBidFile = async (req, res) => {
+export const downloadBidFile = asyncHandler(async (req, res) => {
   try {
     const { jobId, bidId, fileId } = req.params;
 
@@ -77,17 +81,22 @@ export const downloadBidFile = async (req, res) => {
       return res.status(404).json({ message: "Bid not found" });
     }
 
-    const file = bid.files.id(fileId);
+    const file = bid.files.find((f) => f._id.toString() === fileId);
 
     if (!file) {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const filePath = file.fileUrl;
+    const timestamp = new Date().getTime();
+    const fileExtension = file.title.split(".").pop();
+    const newFileName = `file_${timestamp}.${fileExtension}`;
+    const newFilePath = path.join("public/bidFiles", newFileName);
 
-    res.download(filePath, file.title);
+    fs.renameSync(file.fileUrl, newFilePath);
+
+    res.download(newFilePath, file.title);
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.error(error);
   }
-};
+});
