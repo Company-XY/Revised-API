@@ -63,6 +63,35 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 });
 
+export const downloadProductFile = asyncHandler(async (req, res) => {
+  try {
+    const { jobId, fileId } = req.params;
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    const file = job.product.files.find((f) => f._id.toString() === fileId);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const timestamp = new Date().getTime();
+    const fileExtension = file.title.split(".").pop();
+    const newFileName = `file_${timestamp}.${fileExtension}`;
+    const newFilePath = path.join("public/productFiles", newFileName);
+
+    fs.renameSync(file.fileUrl, newFilePath);
+
+    res.download(newFilePath, file.title);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export const updateProduct = asyncHandler(async (req, res) => {
   try {
     const jobId = req.params.jobId;
@@ -140,30 +169,6 @@ export const viewProduct = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(job.product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-export const downloadProductFile = asyncHandler(async (req, res) => {
-  try {
-    const { jobId, fileId } = req.params;
-
-    const job = await Job.findById(jobId);
-
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-
-    const file = job.product.files.find((f) => f._id.toString() === fileId);
-
-    if (!file) {
-      return res.status(404).json({ message: "File not found" });
-    }
-
-    const filePath = path.join(__dirname, file.fileUrl);
-
-    res.download(filePath, file.title);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
