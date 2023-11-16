@@ -1,17 +1,12 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 
-export const createNotification = asyncHandler(async (req, res) => {
+export const createNotification = asyncHandler(async (userId, message) => {
   try {
-    const { id } = req.params;
-    const { message } = req.body;
-
-    const user = await User.findById(id);
+    const user = await User.findById(userId);
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User does not exist, or invalid user ID" });
+      throw new Error("User not found");
     }
 
     const newNotification = {
@@ -21,12 +16,9 @@ export const createNotification = asyncHandler(async (req, res) => {
     };
 
     user.notifications.push(newNotification);
-
     await user.save();
-
-    res.status(201).json(newNotification);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    throw new Error(error.message);
   }
 });
 

@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Job from "../models/Job.js";
 import User from "../models/User.js";
+import { createNotification } from "./notificationsCrud.js";
 
 export const awardBid = asyncHandler(async (req, res) => {
   try {
@@ -36,14 +37,14 @@ export const awardBid = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Freelancer not found" });
     }
 
+    const name = freelancer.name;
+
     const finalPrice = bid.price;
 
     if (client.currentBalance < finalPrice) {
-      return res
-        .status(400)
-        .json({
-          message: "Insufficient funds. Ensure account balance is enough",
-        });
+      return res.status(400).json({
+        message: "Insufficient funds. Ensure account balance is enough",
+      });
     }
 
     job.bids.forEach((otherBid) => {
@@ -64,19 +65,25 @@ export const awardBid = asyncHandler(async (req, res) => {
     bid.status = "Ongoing";
     job.stage = "Ongoing";
 
+    const userId = freelancer._id;
+    const notificationMessage = `Hello ${name}, You've been assigned a job: ${job.title}. Ksh. ${escrowAmount} has been added to your escrow balance`;
+    
+    await createNotification(userId, notificationMessage); 
+
     await job.save();
     await client.save();
     await freelancer.save();
 
     res.status(200).json({
-      message:
-        "Bid awarded, status changed to ongoing, funds put to escrow and job assigned to freelancer",
+      message: "Bid awarded, status changed to ongoing, funds put to escrow and job assigned to freelancer",
       awardedBid: bid,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
+    console.error(error);
   }
 });
+
 
 export const cancelBid = asyncHandler(async (req, res) => {
   try {
