@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Job from "../models/Job.js";
 import User from "../models/User.js";
+import { createNotification } from "./notificationsCrud.js";
 
 export const approveJob = asyncHandler(async (req, res) => {
   try {
@@ -19,6 +20,7 @@ export const approveJob = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Freelancer not found" });
     }
 
+    const name = freelancer.name;
     const escrow = 0.9 * job.finalPrice;
 
     if (freelancer.escrowBalance < escrow) {
@@ -39,6 +41,11 @@ export const approveJob = asyncHandler(async (req, res) => {
 
       await session.commitTransaction();
       session.endSession();
+
+      const userId = freelancer._id;
+      const notificationMessage = `Hello ${name}, The job "${job.title}" has been approved by the client. Ksh. ${escrow} has been added to your account balance`;
+
+      createNotification(userId, notificationMessage);
 
       res.status(200).json({ message: "Job approved and marked as complete." });
     } catch (error) {
