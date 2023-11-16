@@ -110,7 +110,7 @@ export const markNotificationAsRead = asyncHandler(async (req, res) => {
     if (!notification) {
       return res
         .status(404)
-        .json({ message: "Notification not found for the user" });
+        .json({ message: "Notification not found for the user, check ID" });
     }
 
     notification.read = true;
@@ -119,7 +119,7 @@ export const markNotificationAsRead = asyncHandler(async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Notification marked as read successfully" });
+      .json({ message: "Notification marked as read successfully..." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
