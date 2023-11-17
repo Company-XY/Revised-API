@@ -37,8 +37,10 @@ export const createProduct = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    const { name } = req.body;
+    const { name, email } = req.body;
     const review = "Completed";
+
+    const freelancerName = name;
 
     upload.array("files")(req, res, async function (err) {
       if (err) {
@@ -53,6 +55,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 
       const product = {
         name,
+        email,
         review,
         files,
       };
@@ -65,7 +68,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       res.status(201).json(job.product);
 
       const userId = job.user;
-      const notificationMessage = `Hello ${job.name}, ${name} has submitted the project. Check your under reviews tab to verify and approve the project`;
+      const notificationMessage = `Hello ${job.name}, ${freelancerName} has submitted the project. Check your under reviews tab to verify and approve the project`;
 
       await createNotification(userId, notificationMessage);
     });
