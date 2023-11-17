@@ -83,6 +83,7 @@ const jobSchema = Schema(
       ],
       review: String,
       name: String,
+      email: String,
     },
     finalPrice: {
       type: Number,
