@@ -133,6 +133,20 @@ const userSchema = new Schema(
         read: { type: Boolean, default: false },
       },
     ],
+    conversations: [
+      {
+        participant: { type: String, required: true },
+        messages: [
+          {
+            from: { type: String, required: true },
+            to: { type: String, required: true },
+            message: { type: String, required: true },
+            timestamp: { type: Date, default: Date.now },
+            read: { type: Boolean, default: false },
+          },
+        ],
+      },
+    ],
     rating: {
       type: Number,
       default: 0,
