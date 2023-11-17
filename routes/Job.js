@@ -45,7 +45,7 @@ router.post("/jobs/:jobId/submit", createProduct);
 router.patch("/jobs/:jobId/update", updateProduct);
 router.get("/jobs/:jobId/product", viewProduct);
 router.delete("/jobs/:jobId/delete", deleteProduct);
-router.get("/jobs/:jobId/files/:fileIndex", downloadProductFile);
+router.get("/jobs/:jobId/files/:fileId", downloadProductFile);
 
 //---------------------------------------
 
