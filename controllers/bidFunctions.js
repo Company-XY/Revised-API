@@ -67,15 +67,16 @@ export const awardBid = asyncHandler(async (req, res) => {
 
     const userId = freelancer._id;
     const notificationMessage = `Hello ${name}, You've been assigned a job: ${job.title}. Ksh. ${escrowAmount} has been added to your escrow balance`;
-    
-    await createNotification(userId, notificationMessage); 
+
+    createNotification(userId, notificationMessage);
 
     await job.save();
     await client.save();
     await freelancer.save();
 
     res.status(200).json({
-      message: "Bid awarded, status changed to ongoing, funds put to escrow and job assigned to freelancer",
+      message:
+        "Bid awarded, status changed to ongoing, funds put to escrow, job assigned to freelancer and notification sent",
       awardedBid: bid,
     });
   } catch (error) {
@@ -83,7 +84,6 @@ export const awardBid = asyncHandler(async (req, res) => {
     console.error(error);
   }
 });
-
 
 export const cancelBid = asyncHandler(async (req, res) => {
   try {
