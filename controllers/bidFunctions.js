@@ -24,20 +24,14 @@ export const awardBid = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "Bid cannot be awarded" });
     }
 
-    const clientEmail = job.user_email;
-    const client = await User.findOne({ email: clientEmail });
-
-    if (!client) {
-      return res.status(404).json({ message: "Client not found" });
-    }
-
+    const client = await User.findOne({ email: job.user_email });
     const freelancer = await User.findOne({ email: bid.email });
 
-    if (!freelancer) {
-      return res.status(404).json({ message: "Freelancer not found" });
+    if (!client || !freelancer) {
+      return res
+        .status(404)
+        .json({ message: "Client or Freelancer not found" });
     }
-
-    const name = freelancer.name;
 
     const finalPrice = bid.price;
 
@@ -47,6 +41,7 @@ export const awardBid = asyncHandler(async (req, res) => {
       });
     }
 
+    // Update the bid and job details
     job.bids.forEach((otherBid) => {
       if (otherBid.status === "Pending") {
         otherBid.status = "Cancelled";
@@ -55,18 +50,17 @@ export const awardBid = asyncHandler(async (req, res) => {
 
     job.assignedTo = bid.email;
     job.finalPrice = finalPrice;
+    job.stage = "Ongoing";
+    bid.status = "Ongoing";
 
-    const platformFee = 0.1 * finalPrice; // 10% platform fee
     const escrowAmount = 0.9 * finalPrice; // 90% for the freelancer
+    const platformFee = 0.1 * finalPrice; // 10% platform fee
 
     client.currentBalance -= finalPrice;
-    freelancer.escrowBalance += escrowAmount; // Add 90% to the escrow balance
-
-    bid.status = "Ongoing";
-    job.stage = "Ongoing";
+    freelancer.escrowBalance += escrowAmount;
 
     const userId = freelancer._id;
-    const notificationMessage = `Hello ${name}, You've been assigned a job: ${job.title}. Ksh. ${escrowAmount} has been added to your escrow balance`;
+    const notificationMessage = `Hello ${freelancer.name}, You've been assigned a job: ${job.title}. Ksh. ${escrowAmount} has been added to your escrow balance`;
 
     createNotification(userId, notificationMessage);
 
