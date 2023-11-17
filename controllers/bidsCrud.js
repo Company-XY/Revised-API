@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import Job from "../models/Job.js";
 import User from "../models/User.js";
+import { createNotification } from "./notificationsCrud.js";
 
 //multer..................start.........................
 
@@ -52,6 +53,11 @@ export const createBid = asyncHandler(async (req, res) => {
       await job.save();
 
       res.status(201).json(job.bids);
+      const userId = job.user;
+      const notificationMessage = `Hello ${job.name}, ${name} has submitted a bid on your project: ${job.title}. Proceed to the job page to check it out!`;
+
+      await createNotification(userId, notificationMessage);
+      
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

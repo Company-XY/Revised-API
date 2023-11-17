@@ -6,6 +6,7 @@ import { dirname } from "path";
 import fs from "fs/promises";
 import Job from "../models/Job.js";
 import User from "../models/User.js";
+import { createNotification } from "./notificationsCrud.js";
 
 // Multer configuration
 const __filename = fileURLToPath(import.meta.url);
@@ -62,6 +63,11 @@ export const createProduct = asyncHandler(async (req, res) => {
       await job.save();
 
       res.status(201).json(job.product);
+
+      const userId = job.user;
+      const notificationMessage = `Hello ${job.name}, ${name} has submitted the project. Check your under reviews tab to verify and approve the project`;
+
+      await createNotification(userId, notificationMessage);
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

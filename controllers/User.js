@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
+import { createNotification } from "./notificationsCrud.js";
 
 export const registerFreelancer = asyncHandler(async (req, res) => {
   const role = "Freelancer";
@@ -54,6 +55,11 @@ export const registerFreelancer = asyncHandler(async (req, res) => {
         type: user.type,
         token,
       });
+
+      const userId = user._id;
+      const notificationMessage = `Hello ${user.name}, Welcome to Assist Africa. Create a profile, to access the project's dashboard. Then verify your phone number and email address.  `;
+
+      await createNotification(userId, notificationMessage);
     } else {
       res.status(400).json({ message: "Invalid user data" });
     }
@@ -114,6 +120,11 @@ export const registerClient = asyncHandler(async (req, res) => {
         type: user.type,
         token,
       });
+
+      const userId = user._id;
+      const notificationMessage = `Hello ${user.name}, Welcome to Assist Africa. Create a profile to post projects. `;
+
+      await createNotification(userId, notificationMessage);
     } else {
       res
         .status(400)
