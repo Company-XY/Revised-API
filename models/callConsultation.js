@@ -10,6 +10,9 @@ const callSchema = Schema(
     email: {
       type: String,
     },
+    service: {
+      type: String,
+    },
     phone: {
       type: String,
     },

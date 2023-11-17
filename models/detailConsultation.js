@@ -10,6 +10,9 @@ const detailsSchema = Schema(
     email: {
       type: String,
     },
+    service: {
+      type: String,
+    },
     businessName: {
       type: String,
     },

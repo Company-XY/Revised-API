@@ -5,7 +5,8 @@ import User from "../models/User.js";
 // Create a new details posting
 export const createDetails = asyncHandler(async (req, res) => {
   try {
-    const { role, name, email, businessName, prGoals, budget } = req.body;
+    const { role, name, email, service, businessName, prGoals, budget } =
+      req.body;
 
     if (role === "Client") {
       const existingUser = await User.findOne({ email });
@@ -19,6 +20,7 @@ export const createDetails = asyncHandler(async (req, res) => {
       const newDetail = await Detail.create({
         name,
         email,
+        service,
         businessName,
         prGoals,
         budget,
