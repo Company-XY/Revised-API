@@ -7,6 +7,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import util from "util";
 import path from "path";
+import { createNotification } from "./notificationsCrud.js";
 
 dotenv.config();
 
@@ -76,6 +77,10 @@ export const updateIsApproved = asyncHandler(async (req, res) => {
     }
 
     res.status(201).json(user);
+    const userId = id;
+    const notificationMessage = `Hello ${user.name}, Your profile has been successfully updated and the account approved. `;
+
+    await createNotification(userId, notificationMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -238,7 +243,7 @@ export const downloadSampleWorkFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const filePath = file.fileUrl; 
+    const filePath = file.fileUrl;
 
     res.download(filePath, file.title);
   } catch (error) {

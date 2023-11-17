@@ -71,7 +71,21 @@ export const disputeJob = asyncHandler(async (req, res) => {
 
     await job.save();
 
+    const freelancerEmail = job.assignedTo;
+    const freelancer = await User.findOne({ email: freelancerEmail });
+    if (!freelancer) {
+      return res
+        .status(400)
+        .json({ message: "Freelancer not found, try again" });
+    }
+
+    const id = freelancer._id;
+
     res.status(200).json({ message: "Job disputed." });
+    const userId = id;
+    const notificationMessage = `Hello ${freelancer.name}, The project: ${job.title} has been disputed, Check the project to verify!`;
+
+    await createNotification(userId, notificationMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
