@@ -10,6 +10,7 @@ import Bots from "./routes/Bot.js";
 import Consultations from "./routes/Consultation.js";
 import Status from "./routes/Status.js";
 import Notifications from "./routes/Notifications.js";
+import Messages from "./routes/Messages.js";
 
 const app = express();
 app.use(cors());
@@ -40,3 +41,4 @@ app.use("/api/v1", Consultations);
 app.use("/api/v1", Bots);
 app.use("/api/v1", Status);
 app.use("/api/v1", Notifications);
+app.use("/api/v1", Messages);

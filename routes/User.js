@@ -56,8 +56,8 @@ router.post("/verify/phone/code", verifyPhoneWithCode);
 
 //FUNDS DEPOSIT
 //Mpesa Deposit
-router.post("/deposit", createToken, stkPush);
-router.post("/withdraw", b2cWithdraw);
+router.post("/deposit/:userId", createToken, stkPush);
+router.post("/withdraw/:userId", b2cWithdraw);
 
 //http://localhost:8080/api/v1/users/profile/approval/${_id}
 
