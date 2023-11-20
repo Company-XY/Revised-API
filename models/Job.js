@@ -31,7 +31,7 @@ const jobSchema = Schema(
     },
     files: [
       {
-        title: String,
+        filename: String,
         fileUrl: String,
       },
     ],
@@ -56,7 +56,7 @@ const jobSchema = Schema(
         proposal: String,
         files: [
           {
-            title: String,
+            filename: String,
             fileUrl: String,
           },
         ],
@@ -77,7 +77,7 @@ const jobSchema = Schema(
     product: {
       files: [
         {
-          title: String,
+          filename: String,
           fileUrl: String,
         },
       ],

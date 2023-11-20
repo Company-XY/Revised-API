@@ -9,15 +9,12 @@ import User from "../models/User.js";
 import { createNotification } from "./notificationsCrud.js";
 
 // Multer configuration
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/products");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);
   },
 });
 
@@ -40,7 +37,12 @@ export const createProduct = asyncHandler(async (req, res) => {
     const { name, email } = req.body;
     const review = "Completed";
 
-    const freelancerName = name;
+    const freelancer = await User.findOne({ name: name });
+    if (!freelancer) {
+      return res
+        .status(400)
+        .json({ message: "freelancer name not provided from body" });
+    }
 
     upload.array("files")(req, res, async function (err) {
       if (err) {
@@ -49,7 +51,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 
       // Files have been successfully uploaded
       const files = req.files.map((file) => ({
-        title: file.originalname,
+        filename: file.originalname,
         fileUrl: file.path,
       }));
 
@@ -68,9 +70,9 @@ export const createProduct = asyncHandler(async (req, res) => {
       res.status(201).json(job.product);
 
       const userId = job.user;
-      const notificationMessage = `Hello ${job.name}, ${freelancerName} has submitted the project. Check your under reviews tab to verify and approve the project`;
+      const notificationMessage = `Hello ${job.name}, ${freelancer} has submitted the project. Check your under reviews tab to verify and approve the project`;
 
-      await createNotification(userId, notificationMessage);
+      createNotification(userId, notificationMessage);
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -81,13 +83,21 @@ export const downloadProductFile = asyncHandler(async (req, res) => {
   try {
     const { jobId, fileId } = req.params;
 
+    if (!jobId) {
+      return res.status(400).json({ message: "Job Id not provided" });
+    }
+
+    if (!fileId) {
+      return res.status(400).json({ message: "File Id not provided" });
+    }
+
     const job = await Job.findById(jobId);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    const file = job.product.files.find((f) => f._id.toString() === fileId);
+    const file = job.product.files.id(fileId);
 
     if (!file) {
       return res.status(404).json({ message: "File not found" });
@@ -95,9 +105,18 @@ export const downloadProductFile = asyncHandler(async (req, res) => {
 
     const filePath = file.fileUrl;
 
-    res.download(filePath, file.title);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on the server" });
+    }
+
+    res.download(filePath, file.filename, async (error) => {
+      if (error) {
+        return res.status(500).json({ message: "File download failed" });
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.log(error);
   }
 });
 

@@ -13,7 +13,7 @@ import { approveJob, disputeJob } from "../controllers/productFunctions.js";
 import { updateJobFiles } from "../controllers/jobFiles.js";
 import { updateBidFiles } from "../controllers/bidFiles.js";
 
-//import { downloadJobFile } from "../controllers/jobFiles.js";
+import { downloadJobFile } from "../controllers/jobFiles.js";
 
 import {
   getAllJobs,
@@ -21,7 +21,6 @@ import {
   getSingleJob,
   updateJob,
   deleteJob,
-  downloadJobFile,
 } from "../controllers/Jobs.js";
 
 const router = express.Router();

@@ -1,7 +1,4 @@
 import multer from "multer";
-import fs from "fs";
-import path from "path";
-import util from "util";
 import Job from "../models/Job.js";
 import asyncHandler from "express-async-handler";
 
@@ -10,13 +7,13 @@ const storage = multer.diskStorage({
     cb(null, "public/bids");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage }).array("files", 10);
 
-export const updateBidFiles = async (req, res) => {
+export const updateBidFiles = asyncHandler(async (req, res) => {
   try {
     const { bidId, jobId } = req.params;
 
@@ -34,45 +31,38 @@ export const updateBidFiles = async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    const bid = job.bids.id(bidId);
-    if (!bid) {
-      return res.status(404).json({ message: "Bid not found" });
-    }
-
-    const multerUpload = util.promisify(upload.array("files", 10));
-
-    try {
-      await multerUpload(req, res);
-
-      const newFiles = [];
-
-      for (const file of req.files) {
-        const timestamp = new Date().getTime();
-        const fileExtension = file.originalname.split(".").pop();
-        const newFileName = `file_${timestamp}.${fileExtension}`;
-        const filePath = path.join("public/bidFiles", newFileName);
-
-        fs.renameSync(file.path, filePath);
-
-        newFiles.push({
-          title: file.originalname,
-          fileUrl: filePath,
-        });
+    upload(req, res, async (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
       }
 
-      bid.files = bid.files.concat(newFiles);
-      await job.save();
+      try {
+        const bid = job.bids.id(bidId);
+        if (!bid) {
+          return res.status(404).json({ message: "Bid not found" });
+        }
 
-      res.status(200).json({ message: "Bid files updated successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "File upload or save operation failed" });
-      console.error(error);
-    }
+        const uploadedFiles = [];
+        for (const file of req.files) {
+          const { filename, path } = file;
+          uploadedFiles.push({ filename, fileUrl: path });
+        }
+
+        bid.files = bid.files.concat(uploadedFiles);
+        await job.save();
+
+        res.status(200).json({
+          message: "Bid files updated successfully",
+          files: uploadedFiles,
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.error(error);
   }
-};
+});
 
 export const downloadBidFile = asyncHandler(async (req, res) => {
   try {
@@ -110,7 +100,7 @@ export const downloadBidFile = asyncHandler(async (req, res) => {
 
     const filePath = file.fileUrl;
 
-    res.download(filePath, file.title);
+    res.download(filePath, file.filename);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
