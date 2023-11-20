@@ -108,7 +108,7 @@ const userSchema = new Schema(
     },
     sampleWork: [
       {
-        title: String,
+        filename: String,
         fileUrl: String,
       },
     ],
