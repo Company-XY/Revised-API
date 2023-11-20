@@ -1,10 +1,10 @@
 import express from "express";
-import { fetchMessages, createMessage } from "../controllers/messagesCrud.js";
+import { getMessages, createMessage } from "../controllers/messagesCrud.js";
 
 const router = express.Router();
 
-router.post("/messages/:userId/create", createMessage);
+router.post("/messages/create", createMessage);
 
-router.get("/messages/:userId", fetchMessages);
+router.get("/messages/:id", getMessages);
 
 export default router;

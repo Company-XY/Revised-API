@@ -4,59 +4,55 @@ import asyncHandler from "express-async-handler";
 export const createMessage = asyncHandler(async (req, res) => {
   try {
     const { from, to, message } = req.body;
+    if (!from || !to || !message) {
+      return res
+        .status(400)
+        .json({ message: "Provide all the details required" });
+    }
 
-    const sender = await User.findById(from);
-    const recipient = await User.findById(to);
+    const sender = await User.findOne({ email: from });
+    const receiver = await User.findOne({ email: to });
 
-    if (!sender || !recipient) {
-      return res.status(404).json({ error: "Sender or recipient not found" });
+    if (!sender || !receiver) {
+      return res.status(404).json({ message: "Sender or receiver not found" });
     }
 
     const newMessage = {
       from: sender._id,
-      to: recipient._id,
+      to: receiver._id,
       message,
     };
 
-    let conversation = sender.conversations.find(
-      (conv) =>
-        conv.participant.includes(sender._id) &&
-        conv.participant.includes(recipient._id)
-    );
-
-    if (!conversation) {
-      conversation = {
-        participants: [sender._id, recipient._id],
-        messages: [],
-      };
-      sender.conversations.push(conversation);
-      recipient.conversations.push(conversation);
-    }
-
-    conversation.messages.push(newMessage);
+    sender.messages.push(newMessage);
+    receiver.messages.push(newMessage);
 
     await sender.save();
-    await recipient.save();
+    await receiver.save();
 
-    res.status(200).json({ message: "Message sent successfully" });
+    res
+      .status(201)
+      .json({ message: "Message sent successfully", data: newMessage });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-export const fetchMessages = asyncHandler(async (req, res) => {
+export const getMessages = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params;
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Provide user ID" });
     }
 
-    const conversations = user.conversations;
+    const user = await User.findById(id);
 
-    res.status(200).json({ conversations });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const messages = user.messages;
+
+    res.status(200).json({ messages });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
