@@ -20,6 +20,39 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+export const uploadFilesAndUpdateProduct = asyncHandler(async (req, res) => {
+  try {
+    upload.array("files")(req, res, async function (err) {
+      if (err) {
+        return res.status(500).json({ message: "File upload failed" });
+      }
+
+      const files = req.files.map((file) => ({
+        filename: file.originalname,
+        fileUrl: file.path,
+      }));
+
+      const jobId = req.params.jobId;
+      const job = await Job.findById(jobId);
+
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+
+      job.product.files = files;
+
+      await job.save();
+
+      res
+        .status(200)
+        .json({ message: "Files uploaded and job updated successfully" });
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log(error);
+  }
+});
+
 export const createProduct = asyncHandler(async (req, res) => {
   try {
     const { jobId } = req.params;
@@ -44,35 +77,23 @@ export const createProduct = asyncHandler(async (req, res) => {
         .json({ message: "Freelancer name not provided from body" });
     }
 
-    upload.array("files")(req, res, async function (err) {
-      if (err) {
-        return res.status(500).json({ message: "File upload failed" });
-      }
+    const product = {
+      name,
+      email,
+      review,
+    };
 
-      const files = req.files.map((file) => ({
-        filename: file.originalname,
-        fileUrl: file.path,
-      }));
+    job.product = product;
+    job.stage = "UnderReview";
 
-      const product = {
-        name,
-        email,
-        review,
-        files,
-      };
+    await job.save();
 
-      job.product = product;
-      job.stage = "UnderReview";
+    res.status(201).json(job.product);
 
-      await job.save();
+    const userId = job.user;
+    const notificationMessage = `Hello ${job.name}, ${freelancer.name} has submitted the project. Check your under reviews tab to verify and approve the project`;
 
-      res.status(201).json(job.product);
-
-      const userId = job.user;
-      const notificationMessage = `Hello ${job.name}, ${freelancer} has submitted the project. Check your under reviews tab to verify and approve the project`;
-
-      createNotification(userId, notificationMessage);
-    });
+    createNotification(userId, notificationMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log(error);
@@ -83,12 +104,10 @@ export const downloadProductFile = asyncHandler(async (req, res) => {
   try {
     const { jobId, fileId } = req.params;
 
-    if (!jobId) {
-      return res.status(400).json({ message: "Job Id not provided" });
-    }
-
-    if (!fileId) {
-      return res.status(400).json({ message: "File Id not provided" });
+    if (!jobId || !fileId) {
+      return res
+        .status(400)
+        .json({ message: "Job ID or File ID not provided" });
     }
 
     const job = await Job.findById(jobId);
@@ -105,7 +124,9 @@ export const downloadProductFile = asyncHandler(async (req, res) => {
 
     const filePath = file.fileUrl;
 
-    if (!fs.existsSync(filePath)) {
+    try {
+      fs.accessSync(filePath); // Synchronously check if the file exists
+    } catch (error) {
       return res.status(404).json({ message: "File not found on the server" });
     }
 
