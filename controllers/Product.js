@@ -41,15 +41,14 @@ export const createProduct = asyncHandler(async (req, res) => {
     if (!freelancer) {
       return res
         .status(400)
-        .json({ message: "freelancer name not provided from body" });
+        .json({ message: "Freelancer name not provided from body" });
     }
 
     upload.array("files")(req, res, async function (err) {
       if (err) {
-        res.status(500).json({ message: "File upload failed" });
+        return res.status(500).json({ message: "File upload failed" });
       }
 
-      // Files have been successfully uploaded
       const files = req.files.map((file) => ({
         filename: file.originalname,
         fileUrl: file.path,
@@ -76,6 +75,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.log(error);
   }
 });
 
