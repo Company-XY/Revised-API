@@ -1,7 +1,6 @@
 import asyncHandler from "express-async-handler";
 import multer from "multer";
 import fs from "fs";
-import fs from "fs/promises";
 import Job from "../models/Job.js";
 import User from "../models/User.js";
 import { createNotification } from "./notificationsCrud.js";
