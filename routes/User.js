@@ -69,7 +69,7 @@ router.get("/user/profile/other/:id", protect, viewUserProfile);
 router.patch("/users/update/profile/:id", protect, updateProfile);
 router.patch("/users/profile/avatar/:id", protect, uploadAvatar);
 router.patch("/users/profile/samples/:id", protect, uploadSamples);
-router.patch("/users/profile/approval/:id", protect, updateIsApproved);
+router.patch("/users/profile/approval/:id", updateIsApproved);
 
 //CERTIFICATIONS
 router.post("/certifications/add/:id", protect, addCertification);

@@ -28,7 +28,7 @@ const router = express.Router();
 
 router.get("/jobs", protect, getAllJobs);
 router.get("/jobs/:id", protect, getSingleJob);
-router.get("/jobs/:jobId/download/:fileId", protect, downloadJobFile);
+router.get("/jobs/:jobId/download/:fileId", downloadJobFile);
 
 router.post("/jobs/post", protect, createJob);
 router.patch("/jobs/:jobId/files", protect, updateJobFiles);
