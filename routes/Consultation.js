@@ -1,4 +1,5 @@
 import express from "express";
+import { protect } from "../middlewares/authMiddleware.js";
 import {
   createCall,
   updateCall,
@@ -19,25 +20,25 @@ import {
 const router = express.Router();
 
 //call consultations
-router.get("/consultations/calls", getAllCalls);
-router.get("/consultations/calls/:id", getOneCall);
-router.get("/consultations/calls/user", getUserCalls);
+router.get("/consultations/calls", protect, getAllCalls);
+router.get("/consultations/calls/:id", protect, getOneCall);
+router.get("/consultations/calls/user", protect, getUserCalls);
 
-router.post("/consultations/calls/create", createCall);
+router.post("/consultations/calls/create", protect, createCall);
 
-router.patch("/consultations/calls/update/:id", updateCall);
+router.patch("/consultations/calls/update/:id", protect, updateCall);
 
-router.delete("/consultations/calls/delete/:id", deleteCall);
+router.delete("/consultations/calls/delete/:id", protect, deleteCall);
 
 //details consultations
-router.get("/consultations/details", getAllDetails);
-router.get("/consultations/details/:id", getOneDetail);
-router.get("/consultations/details/user", getUserDetails);
+router.get("/consultations/details", protect, getAllDetails);
+router.get("/consultations/details/:id", protect, getOneDetail);
+router.get("/consultations/details/user", protect, getUserDetails);
 
-router.post("/consultations/details/create", createDetails);
+router.post("/consultations/details/create", protect, createDetails);
 
-router.patch("/consultations/details/update/:id", updateDetails);
+router.patch("/consultations/details/update/:id", protect, updateDetails);
 
-router.delete("/consultations/details/delete/:id", deleteDetail);
+router.delete("/consultations/details/delete/:id", protect, deleteDetail);
 
 export default router;
