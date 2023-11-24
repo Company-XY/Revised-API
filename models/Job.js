@@ -45,6 +45,9 @@ const jobSchema = Schema(
       type: Number,
       required: true,
     },
+    experience: {
+      type: String,
+    },
     budget: {
       type: Number,
       required: true,
