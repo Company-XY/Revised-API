@@ -26,7 +26,7 @@ mongoose
   .then(() => {
     app.listen(PORT, () => {
       console.log(
-        `Database Connection Successful & Server Running on Port ${PORT}..@Assist_Africa`
+        `Database Connection Successful & Server Running on Port ${PORT}..@Assist_Africa...Beta`
       );
     });
   })
