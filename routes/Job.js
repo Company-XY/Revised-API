@@ -6,6 +6,7 @@ import {
   viewProduct,
   deleteProduct,
   uploadProductFiles,
+  updateProductFiles,
   downloadProductFile,
 } from "../controllers/Product.js";
 
@@ -43,7 +44,8 @@ router.delete("/jobs/delete/:id", protect, deleteJob);
 //---------------------
 
 router.post("/jobs/:jobId/submit", protect, createProduct);
-router.patch("/jobs/:jobId/files/product", protect, uploadProductFiles);
+//router.patch("/jobs/:jobId/files/product", protect, uploadProductFiles);
+router.patch("/jobs/:jobId/files/product", protect, updateProductFiles);
 router.patch("/jobs/:jobId/update", protect, updateProduct);
 router.get("/jobs/:jobId/product", protect, viewProduct);
 router.delete("/jobs/:jobId/delete", protect, deleteProduct);
