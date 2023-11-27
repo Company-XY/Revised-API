@@ -189,3 +189,29 @@ export const downloadJobFile = asyncHandler(async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+//RECOMMENDED JOBS
+
+export const recommendJobsForUser = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userSkills = user.skills.map((skill) => skill.value);
+
+    const recommendedJobs = await Job.find({
+      skills: { $elemMatch: { value: { $in: userSkills } } },
+      user: { $ne: userId },
+      stage: "Pending",
+    });
+
+    res.status(200).json(recommendedJobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
