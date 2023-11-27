@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const uploadProductMiddleware = multer({ storage: storage });
 
 export const uploadProductFiles = asyncHandler(async (req, res) => {
   try {
@@ -31,7 +31,7 @@ export const uploadProductFiles = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    upload(req, res, async (err) => {
+    uploadProductMiddleware(req, res, async (err) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
@@ -53,10 +53,12 @@ export const uploadProductFiles = asyncHandler(async (req, res) => {
         });
       } catch (error) {
         res.status(500).json({ error: error.message });
+        console.log(error);
       }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.log(error);
   }
 });
 
@@ -225,6 +227,61 @@ export const viewProduct = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(job.product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//============================================================================
+const storageNew = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/products/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}_${file.originalname}`);
+  },
+});
+
+const upload = multer({ storageNew }).array("files", 10);
+
+export const updateProductFiles = asyncHandler(async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    if (!jobId) {
+      return res.status(404).json({ message: "ID not provided" });
+    }
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    upload(req, res, async (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      try {
+        const files = req.files;
+        const uploadedFiles = [];
+        for (const file of files) {
+          const { filename, path } = file;
+          uploadedFiles.push({ filename, fileUrl: path });
+        }
+
+        job.product.files = job.product.files.concat(uploadedFiles);
+        await job.save();
+
+        res.status(200).json({
+          message: "Files uploaded successfully",
+          files: uploadedFiles,
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
