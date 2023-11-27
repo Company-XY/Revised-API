@@ -22,6 +22,7 @@ import {
   getSingleJob,
   updateJob,
   deleteJob,
+  recommendJobsForUser,
 } from "../controllers/Jobs.js";
 
 const router = express.Router();
@@ -52,5 +53,9 @@ router.get("/jobs/:jobId/files/:fileId", protect, downloadProductFile);
 
 router.patch("/jobs/:jobId/approve", protect, approveJob);
 router.patch("/jobs/:jobId/dispute", protect, disputeJob);
+
+//=================================RECOMMENDATIONS
+
+router.get("/jobs/recommended/:userId", protect, recommendJobsForUser);
 
 export default router;

@@ -64,7 +64,7 @@ router.post("/withdraw/:userId", protect, b2cWithdraw);
 
 //PROFILE FUNCTIONS
 //Each should end with the :id param
-router.get("/user/:id", protect, getUserProfile);
+router.get("/user/:id", getUserProfile);
 router.get("/user/profile/other/:id", protect, viewUserProfile);
 router.patch("/users/update/profile/:id", protect, updateProfile);
 router.patch("/users/profile/avatar/:id", protect, uploadAvatar);
