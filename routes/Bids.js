@@ -26,7 +26,8 @@ router.patch("/jobs/bids/update/:jobId/:bidId", protect, updateBid);
 router.delete("/jobs/bids/delete/:jobId/:bidId", protect, deleteBid);
 
 //Bid functions
-router.patch("/jobs/:jobId/bids/:bidId/award", protect, awardBid);
+router.patch("/jobs/:jobId/bids/:bidId/award", awardBid);
+//router.patch("/jobs/:jobId/bids/:bidId/award", protect, awardBid);
 
 router.patch("/jobs/:jobId/bids/:bidId/cancel", protect, cancelBid);
 
