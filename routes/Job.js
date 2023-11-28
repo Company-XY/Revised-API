@@ -53,7 +53,8 @@ router.get("/jobs/:jobId/files/:fileId", protect, downloadProductFile);
 
 //---------------------------------------
 
-router.patch("/jobs/:jobId/approve", protect, approveJob);
+//router.patch("/jobs/:jobId/approve", protect, approveJob);
+router.patch("/jobs/:jobId/approve", approveJob);
 router.patch("/jobs/:jobId/dispute", protect, disputeJob);
 
 //=================================RECOMMENDATIONS
