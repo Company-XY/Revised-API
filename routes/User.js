@@ -46,8 +46,8 @@ router.post("/register/client", registerClient);
 router.post("/register/freelancer", registerFreelancer);
 
 //PASSWORD RECOVERY
-router.post("/password", protect, sendResetLink);
-router.post("/password/reset", protect, resetPassword);
+router.post("/password", sendResetLink);
+router.post("/password/reset", resetPassword);
 
 //EMAIL AND PHONE VERIFICATION
 router.post("/verify/email", protect, sendEmailVerificationCode);
