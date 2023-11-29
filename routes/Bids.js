@@ -17,7 +17,7 @@ const router = express.Router();
 router.get("/jobs/:jobId", protect, getAllBids);
 router.get("/jobs/bids/:jobId/:bidId", protect, getSingleBid);
 
-router.get("/jobs/bids/:jobId/:bidId/:fileId", protect, downloadBidFile);
+router.get("/jobs/bids/:jobId/:bidId/:fileId", downloadBidFile);
 
 router.post("/jobs/:jobId/create", protect, createBid);
 
