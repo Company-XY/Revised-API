@@ -52,12 +52,15 @@ export const createBid = asyncHandler(async (req, res) => {
       job.bids.push(newBid);
       await job.save();
 
-      res.status(201).json(job.bids);
+      const latestBid = job.bids[job.bids.length - 1]; // Accessing the last bid added
+      const newBidId = latestBid._id; // Accessing the _id of the latest bid
+
+      res.status(201).json({ _id: newBidId }); // Sending the _id of the latest bid in the response
+
       const userId = job.user;
       const notificationMessage = `Hello ${job.name}, ${name} has submitted a bid on your project: ${job.title}. Proceed to the job page to check it out!`;
 
       await createNotification(userId, notificationMessage);
-      
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
