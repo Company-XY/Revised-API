@@ -260,7 +260,7 @@ export const updateProductFiles = async (req, res) => {
     }
 
     upload(req, res, async (error) => {
-      if (err) {
+      if (error) {
         return res.status(500).json({ error: error.message });
       }
 
@@ -271,8 +271,16 @@ export const updateProductFiles = async (req, res) => {
           fileUrl: file.path,
         }));
 
+        job.product.files.push(...uploadedFiles); // Update the files array within job.product
+        await job.save();
+
+        // Log uploadedFiles to check if it contains the necessary file information
+        console.log(uploadedFiles);
+
         job.product.files.push(...uploadedFiles);
         await job.save();
+
+        console.log(files);
 
         res.status(200).json({
           message: "Files uploaded successfully",
