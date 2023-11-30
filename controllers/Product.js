@@ -232,7 +232,8 @@ export const viewProduct = asyncHandler(async (req, res) => {
   }
 });
 
-//============================================================================
+//=============================
+
 const storageNew = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/products/");
@@ -242,9 +243,9 @@ const storageNew = multer.diskStorage({
   },
 });
 
-const upload = multer({ storageNew }).array("files", 10);
+const upload = multer({ storageNew }).array("files", 20);
 
-export const updateProductFiles = asyncHandler(async (req, res) => {
+export const updateProductFiles = async (req, res) => {
   try {
     const { jobId } = req.params;
 
@@ -258,20 +259,19 @@ export const updateProductFiles = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    upload(req, res, async (err) => {
+    upload(req, res, async (error) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: error.message });
       }
 
       try {
         const files = req.files;
-        const uploadedFiles = [];
-        for (const file of files) {
-          const { filename, path } = file;
-          uploadedFiles.push({ filename, fileUrl: path });
-        }
+        const uploadedFiles = files.map((file) => ({
+          filename: file.filename,
+          fileUrl: file.path,
+        }));
 
-        job.product.files = job.product.files.concat(uploadedFiles);
+        job.product.files.push(...uploadedFiles);
         await job.save();
 
         res.status(200).json({
@@ -285,4 +285,4 @@ export const updateProductFiles = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};

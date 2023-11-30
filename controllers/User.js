@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
+import Job from "../models/Job.js";
 import generateToken from "../utils/generateToken.js";
 import { createNotification } from "./notificationsCrud.js";
 
@@ -173,6 +174,39 @@ export const getUsers = asyncHandler(async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//=================================================================
+
+export const getCompletedJobs = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "User ID not provided" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found, check ID" });
+    }
+
+    const userEmail = user.email;
+
+    const completedJobs = await Job.find({
+      $or: [{ user_email: userEmail }, { assignedTo: userEmail }],
+      stage: "Complete",
+    });
+
+    if (!completedJobs || completedJobs.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "User has no completed projects yet" });
+    }
+
+    res.status(200).json(completedJobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
