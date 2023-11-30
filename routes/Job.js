@@ -29,8 +29,8 @@ import { updateProductFiles } from "../controllers/productFiles.js";
 
 const router = express.Router();
 
-router.get("/jobs", getAllJobs);
-router.get("/jobs/:id", getSingleJob);
+router.get("/jobs", protect, getAllJobs);
+router.get("/jobs/:id", protect, getSingleJob);
 router.get("/jobs/:jobId/download/:fileId", downloadJobFile);
 
 router.post("/jobs/post", protect, createJob);
