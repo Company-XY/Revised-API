@@ -6,6 +6,7 @@ import {
   loginUser,
   getUsers,
   updateBalance,
+  getCompletedJobs,
 } from "../controllers/User.js";
 import { sendResetLink, resetPassword } from "../controllers/Password.js";
 import {
@@ -70,6 +71,9 @@ router.patch("/users/update/profile/:id", protect, updateProfile);
 router.patch("/users/profile/avatar/:id", protect, uploadAvatar);
 router.patch("/users/profile/samples/:id", protect, uploadSamples);
 router.patch("/users/profile/approval/:id", updateIsApproved);
+
+//COMPLETED JOBS
+router.get("/user/completed/:id", protect, getCompletedJobs);
 
 //CERTIFICATIONS
 router.post("/certifications/add/:id", protect, addCertification);
