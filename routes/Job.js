@@ -51,7 +51,7 @@ router.patch("/jobs/:jobId/files/product", protect, updateProductFiles);
 router.patch("/jobs/:jobId/update", protect, updateProduct);
 router.get("/jobs/:jobId/product", protect, viewProduct);
 router.delete("/jobs/:jobId/delete", protect, deleteProduct);
-router.get("/jobs/:jobId/files/:fileId", protect, downloadProductFile);
+router.get("/jobs/:jobId/files/:fileId", downloadProductFile);
 
 //---------------------------------------
 
