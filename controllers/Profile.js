@@ -251,3 +251,29 @@ export const downloadSampleWorkFile = async (req, res) => {
     console.error(error);
   }
 };
+
+//================SKILLS TO PROFILE==============
+
+export const updateSkills = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { skills } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID not provided" });
+    }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.skills = skills;
+
+    const updatedUser = await user.save();
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});

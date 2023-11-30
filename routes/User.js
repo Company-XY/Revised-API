@@ -23,6 +23,7 @@ import {
   viewUserProfile,
   uploadSamples,
   downloadSampleWorkFile,
+  updateSkills,
 } from "../controllers/Profile.js";
 import {
   createToken,
@@ -82,7 +83,12 @@ router.patch("/certifications/:id/:certId", protect, updateCertification);
 //TO BE DELETED
 router.patch("/money/:id", updateBalance);
 
+//`https://assist-api-5y59.onrender.com/api/v1/user/skills/${userId}`,
+
 //SAMPLE FILES GET
-router.get("/user/:id/samples/:fileId", protect, downloadSampleWorkFile);
+router.get("/user/:id/samples/:fileId", downloadSampleWorkFile);
+
+//SKILLS
+router.patch("/user/skills/:id", protect, updateSkills);
 
 export default router;
