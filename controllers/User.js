@@ -201,12 +201,10 @@ export const getCompletedJobs = asyncHandler(async (req, res) => {
     });
 
     if (!completedJobs || completedJobs.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "User has no completed projects yet" });
+      return res.status(200).json({ completedJobsCount: 0 });
     }
 
-    res.status(200).json(completedJobs);
+    res.status(200).json({ completedJobs });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
