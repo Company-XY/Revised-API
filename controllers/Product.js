@@ -93,7 +93,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     };
 
     job.product = product;
-    job.stage = "UnderReview";
+    job.stage = "Under Review";
 
     await job.save();
 
@@ -280,7 +280,6 @@ export const updateProductFiles = async (req, res) => {
         job.product.files.push(...uploadedFiles);
         await job.save();
 
-        console.log(files);
 
         res.status(200).json({
           message: "Files uploaded successfully",
