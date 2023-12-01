@@ -238,3 +238,41 @@ export const updateBalance = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+//++============================FREELANCER RATING+++++++++++++++======
+
+export const getFreelancerAverageRating = asyncHandler(async (req, res) => {
+  try {
+    const freelancerId = req.params.freelancerId;
+
+    const freelancer = await User.findById(freelancerId);
+
+    if (!freelancer) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    const freelancerEmail = freelancer.email;
+
+    const jobs = await Job.find({ assignedTo: freelancerEmail });
+
+    const completedJobs = jobs.filter(
+      (job) => job.stage === "Complete" && job.freelancerRating
+    );
+
+    if (completedJobs.length === 0) {
+      return res.status(200).json({ averageRating: 0 });
+    }
+
+    const totalRatings = completedJobs.reduce(
+      (total, job) => total + job.freelancerRating,
+      0
+    );
+    const averageRating = totalRatings / completedJobs.length;
+
+    res
+      .status(200)
+      .json({ averageRating: parseFloat(averageRating.toFixed(1)) });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});

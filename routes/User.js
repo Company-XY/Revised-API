@@ -7,6 +7,7 @@ import {
   getUsers,
   updateBalance,
   getCompletedJobs,
+  getFreelancerAverageRating,
 } from "../controllers/User.js";
 import { sendResetLink, resetPassword } from "../controllers/Password.js";
 import {
@@ -90,5 +91,12 @@ router.get("/user/:id/samples/:fileId", downloadSampleWorkFile);
 
 //SKILLS
 router.patch("/user/skills/:id", protect, updateSkills);
+
+//RATING
+router.get(
+  "/freelancer/rating/:freelancerId",
+  protect,
+  getFreelancerAverageRating
+);
 
 export default router;
