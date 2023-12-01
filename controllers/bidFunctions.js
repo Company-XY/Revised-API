@@ -53,6 +53,8 @@ export const awardBid = asyncHandler(async (req, res) => {
     job.stage = "Ongoing";
     bid.status = "Ongoing";
 
+    job.awardedAt = new Date();
+
     const escrowAmount = 0.9 * finalPrice; // 90% for the freelancer
     const platformFee = 0.1 * finalPrice; // 10% platform fee
 

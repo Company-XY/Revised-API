@@ -96,7 +96,7 @@ const jobSchema = Schema(
       enum: [
         "Pending",
         "Ongoing",
-        "UnderReview",
+        "Under Review",
         "Disputed",
         "Complete",
         "Approved",
@@ -107,7 +107,12 @@ const jobSchema = Schema(
       type: Boolean,
       default: false,
     },
-    review: String,
+    review: {
+      type: String,
+    },
+    awardedAt: {
+      type: Date,
+    },
     rating: {
       type: Number,
       min: 1,
