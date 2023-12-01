@@ -200,10 +200,6 @@ export const getCompletedJobs = asyncHandler(async (req, res) => {
       stage: "Complete",
     });
 
-    if (!completedJobs || completedJobs.length === 0) {
-      return res.status(200).json({ completedJobsCount: 0 });
-    }
-
     res.status(200).json({ completedJobs });
   } catch (error) {
     res.status(500).json({ message: error.message });
