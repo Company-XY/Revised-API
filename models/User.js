@@ -73,7 +73,17 @@ const userSchema = new Schema(
       default: 0,
     },
     location: {
-      type: String,
+      city: {
+        type: String,
+      },
+      country: {
+        name: {
+          type: String,
+        },
+        code: {
+          type: String,
+        },
+      },
     },
     contactInfo: {
       type: String,
