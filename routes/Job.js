@@ -5,11 +5,15 @@ import {
   updateProduct,
   viewProduct,
   deleteProduct,
-  uploadProductFiles,
   downloadProductFile,
 } from "../controllers/Product.js";
 
-import { approveJob, disputeJob } from "../controllers/productFunctions.js";
+import {
+  approveJob,
+  disputeJob,
+  leaveReview,
+  updateFreelancerRating,
+} from "../controllers/productFunctions.js";
 
 import { updateJobFiles } from "../controllers/jobFiles.js";
 import { updateBidFiles } from "../controllers/bidFiles.js";
@@ -58,6 +62,8 @@ router.get("/jobs/:jobId/files/:fileId", downloadProductFile);
 //router.patch("/jobs/:jobId/approve", protect, approveJob);
 router.patch("/jobs/:jobId/approve", approveJob);
 router.patch("/jobs/:jobId/dispute", protect, disputeJob);
+router.patch("/jobs/:jobId/review", leaveReview);
+router.patch("/jobs/:jobId/rating", updateFreelancerRating);
 
 //=================================RECOMMENDATIONS
 

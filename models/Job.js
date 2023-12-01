@@ -113,7 +113,13 @@ const jobSchema = Schema(
     awardedAt: {
       type: Date,
     },
-    rating: {
+    freelancerRating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+    //Client Rating to be changed to client score
+    clientRating: {
       type: Number,
       min: 1,
       max: 5,

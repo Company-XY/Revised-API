@@ -91,10 +91,10 @@ export const disputeJob = asyncHandler(async (req, res) => {
   }
 });
 
-export const leaveProductReview = asyncHandler(async (req, res) => {
+export const leaveReview = asyncHandler(async (req, res) => {
   try {
     const jobId = req.params.jobId;
-    const review = req.body.review;
+    const { review } = req.body;
 
     const job = await Job.findById(jobId);
 
@@ -102,21 +102,19 @@ export const leaveProductReview = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    job.product.review = review;
-
+    job.review = review;
     await job.save();
 
-    res.status(200).json({ message: "Product review added." });
+    res.status(200).json({ message: "Review submitted successfully." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-export const addFreelancerRating = asyncHandler(async (req, res) => {
+export const updateFreelancerRating = asyncHandler(async (req, res) => {
   try {
     const jobId = req.params.jobId;
-    const bidId = req.params.bidId;
-    const rating = req.body.rating;
+    const { freelancerRating } = req.body;
 
     const job = await Job.findById(jobId);
 
@@ -124,17 +122,16 @@ export const addFreelancerRating = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    const bid = job.bids.id(bidId);
+    if (freelancerRating && freelancerRating >= 1 && freelancerRating <= 5) {
+      job.freelancerRating = freelancerRating;
+      await job.save();
 
-    if (!bid) {
-      return res.status(404).json({ message: "Bid not found" });
+      res
+        .status(200)
+        .json({ message: "Freelancer rating updated successfully." });
+    } else {
+      return res.status(400).json({ message: "Invalid rating value" });
     }
-
-    bid.rating = rating;
-
-    await job.save();
-
-    res.status(200).json({ message: "Freelancer rating added." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
