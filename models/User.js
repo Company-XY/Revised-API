@@ -52,7 +52,15 @@ const userSchema = new Schema(
       required: true,
     },
     phone: {
-      type: String,
+      countryCode: {
+        type: String,
+      },
+      phoneNumber: {
+        type: String,
+      },
+      combined: {
+        type: String,
+      },
     },
     phoneVerified: {
       type: Boolean,

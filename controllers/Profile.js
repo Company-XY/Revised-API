@@ -126,11 +126,11 @@ export const viewUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-//update user profile
+//Update user profile
 export const updateProfile = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const { phone: phoneNumber, ...updateFields } = req.body;
+    const { phone, ...updateFields } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -138,25 +138,34 @@ export const updateProfile = asyncHandler(async (req, res) => {
     }
 
     if (
-      !phoneNumber ||
-      typeof phoneNumber !== "string" ||
-      phoneNumber.length !== 10
+      phone &&
+      (!phone.countryCode ||
+        !phone.phoneNumber ||
+        typeof phone.countryCode !== "string" ||
+        typeof phone.phoneNumber !== "string")
     ) {
       return res.status(400).json({ message: "Invalid phone number format" });
     }
 
-    const formattedPhoneNumber = `+254${phoneNumber.slice(1)}`;
+    if (phone) {
+      const { countryCode, phoneNumber } = phone;
+      const combinedPhoneNumber = `+${countryCode}${phoneNumber}`;
 
-    const existingUserWithPhone = await User.findOne({
-      phone: formattedPhoneNumber,
-      _id: { $ne: id },
-    });
+      const existingUserWithPhone = await User.findOne({
+        "phone.combined": combinedPhoneNumber,
+        _id: { $ne: id },
+      });
 
-    if (existingUserWithPhone) {
-      return res.status(400).json({ message: "Phone number already in use" });
+      if (existingUserWithPhone) {
+        return res.status(400).json({ message: "Phone number already in use" });
+      }
+
+      user.phone = {
+        countryCode,
+        phoneNumber,
+        combined: combinedPhoneNumber,
+      };
     }
-
-    user.phone = formattedPhoneNumber;
 
     Object.keys(updateFields).forEach((key) => {
       user[key] = updateFields[key];
@@ -166,7 +175,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.error(error);
   }
 });
 
