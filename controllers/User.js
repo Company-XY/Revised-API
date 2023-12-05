@@ -237,7 +237,7 @@ export const updateBalance = asyncHandler(async (req, res) => {
 
 export const getFreelancerAverageRating = asyncHandler(async (req, res) => {
   try {
-    const freelancerId = req.params;
+    const { freelancerId } = req.params;
 
     const freelancer = await User.findById(freelancerId);
 
