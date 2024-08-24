@@ -1,4 +1,4 @@
-# Revised-API.
+# Revised-API
 
 <hr/>
 
